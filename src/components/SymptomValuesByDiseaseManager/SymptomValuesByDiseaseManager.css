@@ -1,0 +1,41 @@
+.svd-manager {
+  display: flex;
+  gap: 40px;
+  padding: 20px;
+  font-size: 14px;
+  flex: 1;
+}
+
+.svd-column {
+  flex: 1;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.svd-list {
+  list-style: none;
+  border: 1px solid #ccc;
+  height: 180px;
+  overflow-y: auto;
+  padding: 5px;
+  margin-bottom: 20px;
+  background-color: white;
+}
+
+.svd-list li {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.svd-list li:hover {
+  background-color: #eee;
+}
+
+.svd-list li.selected {
+  background-color: #a2f5a2;
+}

@@ -1,0 +1,102 @@
+.diagnosis-engine {
+  display: flex;
+  padding: 20px;
+  font-size: 14px;
+  gap: 40px;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.input-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkbox-list {
+  list-style: none;
+  padding: 0;
+  border: 1px solid #ccc;
+  height: 160px;
+  overflow-y: auto;
+  background: white;
+  margin: 0;
+}
+
+.checkbox-list li {
+  padding: 5px 10px;
+}
+
+.input-panel select,
+.input-panel button {
+  padding: 6px;
+  font-size: 14px;
+}
+
+.input-panel button {
+  width: fit-content;
+  background-color: #009a3e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.summary-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.summary-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  background: white;
+}
+
+.summary-panel th,
+.summary-panel td {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.diagnosis-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.diagnose-btn {
+  background-color: #009a3e;
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.diagnosis-result {
+  font-weight: bold;
+  color: #155724;
+}
+
+.diagnosis-engine::after {
+  content: "";
+  display: block;
+  height: 80px;
+}
