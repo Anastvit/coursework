@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Sidebar from "@components/Sidebar";
 import DiseaseManager from "@components/DiseaseManager";
 import SymptomManager from "@components/SymptomManager";
@@ -10,27 +10,67 @@ import KnowledgeCheck from "@components/KnowledgeCheck";
 import DiagnosisEngine from "@components/DiagnosisEngine";
 import "./KnowledgeBaseEditor.css";
 
-const KnowledgeBaseEditor = () => {
-  const [activeModule, setActiveModule] = useState(null);
+const KnowledgeBaseEditor = ({ knowledgeBase, setKnowledgeBase }) => {
+  const [activeModule, setActiveModule] = React.useState(null);
 
   const renderModule = () => {
     switch (activeModule) {
       case "Заболевания":
-        return <DiseaseManager />;
+        return (
+          <DiseaseManager
+            knowledgeBase={knowledgeBase}
+            setKnowledgeBase={setKnowledgeBase}
+          />
+        );
       case "Признаки":
-        return <SymptomManager />;
+        return (
+          <SymptomManager
+            knowledgeBase={knowledgeBase}
+            setKnowledgeBase={setKnowledgeBase}
+          />
+        );
       case "Возможные значения признаков":
-        return <SymptomValuesManager />;
+        return (
+          <SymptomValuesManager
+            knowledgeBase={knowledgeBase}
+            setKnowledgeBase={setKnowledgeBase}
+          />
+        );
       case "Нормальные значения признаков":
-        return <NormalValuesManager />;
+        return (
+          <NormalValuesManager
+            knowledgeBase={knowledgeBase}
+            setKnowledgeBase={setKnowledgeBase}
+          />
+        );
       case "Клиническая картина":
-        return <ClinicalPictureManager />;
+        return (
+          <ClinicalPictureManager
+            knowledgeBase={knowledgeBase}
+            setKnowledgeBase={setKnowledgeBase}
+          />
+        );
       case "Значения признаков для заболеваний":
-        return <SymptomValuesByDiseaseManager />;
-      case "Проверка полноты знаний":
-        return <KnowledgeCheck />;
+        return (
+          <SymptomValuesByDiseaseManager
+            knowledgeBase={knowledgeBase}
+            setKnowledgeBase={setKnowledgeBase}
+          />
+        );
+        case "Проверка полноты знаний":
+          return (
+            <KnowledgeCheck
+              knowledgeBase={knowledgeBase}
+              setKnowledgeBase={setKnowledgeBase}
+            />
+          );        
       case "Диагностика":
-        return <DiagnosisEngine />;
+        return (
+          <DiagnosisEngine
+            knowledgeBase={knowledgeBase}
+            setKnowledgeBase={setKnowledgeBase}
+          />
+        );
       default:
         return <div style={{ padding: "20px" }}>Выберите раздел слева</div>;
     }

@@ -1,58 +1,50 @@
 import React, { useState } from "react";
 import "./ClinicalPictureManager.css";
 
-const ClinicalPictureManager = () => {
-  const [diseases] = useState(["Перелом", "Вывих", "Ушиб"]);
-  const [symptoms] = useState([
-    "Происхождение",
-    "Локализация",
-    "Наличие \"пустоты\" в месте травмы",
-    "Поврежденная",
-    "Отсутствует"
-  ]);
+const ClinicalPictureManager = ({ knowledgeBase, setKnowledgeBase }) => {
+  const diseases = knowledgeBase.diseases || [];
+  const symptoms = knowledgeBase.symptoms || [];
+  const clinicalPicture = knowledgeBase.clinicalPicture || {};
 
-  const [selectedDisease, setSelectedDisease] = useState(diseases[0]);
+  const [selectedDisease, setSelectedDisease] = useState(diseases[0] || "");
+  const [selectedAvailableIndex, setSelectedAvailableIndex] = useState(null);
+  const [selectedCurrentIndex, setSelectedCurrentIndex] = useState(null);
 
-  const [clinicalData, setClinicalData] = useState({
-    Перелом: ["Отсутствует"],
-    Вывих: [],
-    Ушиб: []
-  });
+  const current = clinicalPicture[selectedDisease] || [];
+  const available = symptoms.filter((s) => !current.includes(s));
 
-  const [selectedSymptomIndex, setSelectedSymptomIndex] = useState(null);
-  const [selectedDiseaseSymptomIndex, setSelectedDiseaseSymptomIndex] =
-    useState(null);
+  const addSymptom = () => {
+    if (selectedAvailableIndex === null) return;
 
-  const currentSymptoms = clinicalData[selectedDisease] || [];
+    const symptom = available[selectedAvailableIndex];
 
-  const availableSymptoms = symptoms.filter(
-    (s) => !currentSymptoms.includes(s)
-  );
+    const updated = {
+      ...knowledgeBase,
+      clinicalPicture: {
+        ...clinicalPicture,
+        [selectedDisease]: [...current, symptom]
+      }
+    };
 
-  const addSymptomToDisease = () => {
-    if (selectedSymptomIndex === null) return;
-
-    const selectedSymptom = availableSymptoms[selectedSymptomIndex];
-
-    setClinicalData((prev) => ({
-      ...prev,
-      [selectedDisease]: [...prev[selectedDisease], selectedSymptom]
-    }));
-
-    setSelectedSymptomIndex(null);
+    setKnowledgeBase(updated);
+    setSelectedAvailableIndex(null);
   };
 
-  const removeSymptomFromDisease = () => {
-    if (selectedDiseaseSymptomIndex === null) return;
+  const removeSymptom = () => {
+    if (selectedCurrentIndex === null) return;
 
-    setClinicalData((prev) => ({
-      ...prev,
-      [selectedDisease]: prev[selectedDisease].filter(
-        (_, i) => i !== selectedDiseaseSymptomIndex
-      )
-    }));
+    const updatedList = current.filter((_, i) => i !== selectedCurrentIndex);
 
-    setSelectedDiseaseSymptomIndex(null);
+    const updated = {
+      ...knowledgeBase,
+      clinicalPicture: {
+        ...clinicalPicture,
+        [selectedDisease]: updatedList
+      }
+    };
+
+    setKnowledgeBase(updated);
+    setSelectedCurrentIndex(null);
   };
 
   return (
@@ -62,8 +54,8 @@ const ClinicalPictureManager = () => {
         value={selectedDisease}
         onChange={(e) => {
           setSelectedDisease(e.target.value);
-          setSelectedSymptomIndex(null);
-          setSelectedDiseaseSymptomIndex(null);
+          setSelectedAvailableIndex(null);
+          setSelectedCurrentIndex(null);
         }}
       >
         {diseases.map((d, i) => (
@@ -75,35 +67,35 @@ const ClinicalPictureManager = () => {
 
       <div className="dual-list">
         <div className="list-column">
-          <div className="list-title">Множество признаков</div>
+          <div className="list-title">Все признаки</div>
           <ul>
-            {availableSymptoms.map((symptom, i) => (
+            {available.map((s, i) => (
               <li
                 key={i}
-                className={selectedSymptomIndex === i ? "selected" : ""}
-                onClick={() => setSelectedSymptomIndex(i)}
+                className={selectedAvailableIndex === i ? "selected" : ""}
+                onClick={() => setSelectedAvailableIndex(i)}
               >
-                {symptom}
+                {s}
               </li>
             ))}
           </ul>
         </div>
 
         <div className="list-buttons">
-          <button onClick={addSymptomToDisease}>&gt;</button>
-          <button onClick={removeSymptomFromDisease}>&lt;</button>
+          <button onClick={addSymptom}>&gt;</button>
+          <button onClick={removeSymptom}>&lt;</button>
         </div>
 
         <div className="list-column">
-          <div className="list-title">Выбранные признаки</div>
+          <div className="list-title">Клиническая картина</div>
           <ul>
-            {currentSymptoms.map((symptom, i) => (
+            {current.map((s, i) => (
               <li
                 key={i}
-                className={selectedDiseaseSymptomIndex === i ? "selected" : ""}
-                onClick={() => setSelectedDiseaseSymptomIndex(i)}
+                className={selectedCurrentIndex === i ? "selected" : ""}
+                onClick={() => setSelectedCurrentIndex(i)}
               >
-                {symptom}
+                {s}
               </li>
             ))}
           </ul>

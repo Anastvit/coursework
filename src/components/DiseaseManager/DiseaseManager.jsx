@@ -1,24 +1,33 @@
-import React, { useState } from 'react';
-import './DiseaseManager.css';
+import React, { useState } from "react";
+import "./DiseaseManager.css";
 
-const DiseaseManager = () => {
-  const [diseases, setDiseases] = useState([
-    "Перелом",
-    "Вывих",
-    "Травма мышц и сухожилий"
-  ]);
-  const [newDisease, setNewDisease] = useState('');
+const DiseaseManager = ({ knowledgeBase, setKnowledgeBase }) => {
+  const diseases = knowledgeBase.diseases || [];
+  const [newDisease, setNewDisease] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(null);
 
   const addDisease = () => {
-    if (newDisease.trim() === '') return;
-    setDiseases([...diseases, newDisease.trim()]);
-    setNewDisease('');
+    const trimmed = newDisease.trim();
+    if (!trimmed || diseases.includes(trimmed)) return;
+
+    setKnowledgeBase({
+      ...knowledgeBase,
+      diseases: [...diseases, trimmed]
+    });
+
+    setNewDisease("");
   };
 
   const removeDisease = () => {
     if (selectedIndex === null) return;
-    setDiseases(diseases.filter((_, index) => index !== selectedIndex));
+
+    const updated = diseases.filter((_, index) => index !== selectedIndex);
+
+    setKnowledgeBase({
+      ...knowledgeBase,
+      diseases: updated
+    });
+
     setSelectedIndex(null);
   };
 
@@ -37,11 +46,11 @@ const DiseaseManager = () => {
       <label>Список заболеваний</label>
       <div className="list-box">
         <ul>
-          {diseases.map((disease, index) => (
+          {diseases.map((disease, i) => (
             <li
-              key={index}
-              onClick={() => setSelectedIndex(index)}
-              className={selectedIndex === index ? 'selected' : ''}
+              key={i}
+              onClick={() => setSelectedIndex(i)}
+              className={selectedIndex === i ? "selected" : ""}
             >
               {disease}
             </li>

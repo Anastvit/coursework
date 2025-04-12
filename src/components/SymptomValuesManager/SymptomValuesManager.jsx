@@ -1,59 +1,51 @@
 import React, { useState } from "react";
 import "./SymptomValuesManager.css";
 
-const SymptomValuesManager = () => {
-  const [symptoms] = useState([
-    "Наличие видимых повреждений",
-    "Острая боль",
-    "Хруст при попытке движения",
-    "Ненормальная подвижность"
-  ]);
+const SymptomValuesManager = ({ knowledgeBase, setKnowledgeBase }) => {
+  const symptoms = knowledgeBase.symptoms || [];
+  const symptomValues = knowledgeBase.symptomValues || {};
 
-  const [selectedSymptom, setSelectedSymptom] = useState(symptoms[0]);
-  const [valueInput, setValueInput] = useState("");
+  const [selectedSymptom, setSelectedSymptom] = useState(symptoms[0] || "");
+  const [newValue, setNewValue] = useState("");
   const [selectedValueIndex, setSelectedValueIndex] = useState(null);
 
-  const [valuesBySymptom, setValuesBySymptom] = useState({
-    "Наличие видимых повреждений": [
-      "Отсутствует",
-      "Присутствует",
-      "Полная",
-      "Неполная",
-      "Ноги",
-      "Руки",
-      "Голова"
-    ],
-    "Острая боль": [],
-    "Хруст при попытке движения": [],
-    "Ненормальная подвижность": []
-  });
+  const values = symptomValues[selectedSymptom] || [];
 
   const addValue = () => {
-    if (!valueInput.trim()) return;
+    const trimmed = newValue.trim();
+    if (!trimmed || values.includes(trimmed)) return;
 
-    setValuesBySymptom((prev) => ({
-      ...prev,
-      [selectedSymptom]: [...prev[selectedSymptom], valueInput.trim()]
-    }));
+    const updated = {
+      ...knowledgeBase,
+      symptomValues: {
+        ...symptomValues,
+        [selectedSymptom]: [...values, trimmed]
+      }
+    };
 
-    setValueInput("");
+    setKnowledgeBase(updated);
+    setNewValue("");
   };
 
   const removeValue = () => {
     if (selectedValueIndex === null) return;
 
-    setValuesBySymptom((prev) => ({
-      ...prev,
-      [selectedSymptom]: prev[selectedSymptom].filter(
-        (_, i) => i !== selectedValueIndex
-      )
-    }));
+    const updatedValues = values.filter((_, i) => i !== selectedValueIndex);
 
+    const updated = {
+      ...knowledgeBase,
+      symptomValues: {
+        ...symptomValues,
+        [selectedSymptom]: updatedValues
+      }
+    };
+
+    setKnowledgeBase(updated);
     setSelectedValueIndex(null);
   };
 
   return (
-    <div className="symptom-values-manager">
+    <div className="disease-manager">
       <label>Выберите признак</label>
       <select
         value={selectedSymptom}
@@ -62,9 +54,9 @@ const SymptomValuesManager = () => {
           setSelectedValueIndex(null);
         }}
       >
-        {symptoms.map((symptom, i) => (
-          <option key={i} value={symptom}>
-            {symptom}
+        {symptoms.map((s, i) => (
+          <option key={i} value={s}>
+            {s}
           </option>
         ))}
       </select>
@@ -72,17 +64,17 @@ const SymptomValuesManager = () => {
       <label>Возможное значение</label>
       <div className="input-row">
         <input
-          value={valueInput}
-          onChange={(e) => setValueInput(e.target.value)}
+          type="text"
+          value={newValue}
+          onChange={(e) => setNewValue(e.target.value)}
         />
-        <button className="add-btn" onClick={addValue}>
-          +
-        </button>
+        <button className="add-btn" onClick={addValue}>+</button>
       </div>
 
+      <label>Список значений</label>
       <div className="list-box">
         <ul>
-          {(valuesBySymptom[selectedSymptom] || []).map((val, i) => (
+          {values.map((val, i) => (
             <li
               key={i}
               onClick={() => setSelectedValueIndex(i)}
@@ -92,9 +84,7 @@ const SymptomValuesManager = () => {
             </li>
           ))}
         </ul>
-        <button className="remove-btn" onClick={removeValue}>
-          -
-        </button>
+        <button className="remove-btn" onClick={removeValue}>-</button>
       </div>
     </div>
   );

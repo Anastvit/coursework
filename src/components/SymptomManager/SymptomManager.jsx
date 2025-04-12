@@ -1,29 +1,33 @@
 import React, { useState } from "react";
 import "./SymptomManager.css";
 
-const SymptomManager = () => {
-  const [symptoms, setSymptoms] = useState([
-    "Наличие видимых повреждений",
-    "Острая боль",
-    "Хруст при попытке движения",
-    "Ненормальная подвижность",
-    "Локализация",
-    "Целостность тканей",
-    "Видимые костные фрагменты"
-  ]);
-
+const SymptomManager = ({ knowledgeBase, setKnowledgeBase }) => {
+  const symptoms = knowledgeBase.symptoms || [];
   const [newSymptom, setNewSymptom] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(null);
 
   const addSymptom = () => {
-    if (!newSymptom.trim()) return;
-    setSymptoms([...symptoms, newSymptom.trim()]);
+    const trimmed = newSymptom.trim();
+    if (!trimmed || symptoms.includes(trimmed)) return;
+
+    setKnowledgeBase({
+      ...knowledgeBase,
+      symptoms: [...symptoms, trimmed]
+    });
+
     setNewSymptom("");
   };
 
   const removeSymptom = () => {
     if (selectedIndex === null) return;
-    setSymptoms(symptoms.filter((_, i) => i !== selectedIndex));
+
+    const updated = symptoms.filter((_, index) => index !== selectedIndex);
+
+    setKnowledgeBase({
+      ...knowledgeBase,
+      symptoms: updated
+    });
+
     setSelectedIndex(null);
   };
 
@@ -32,6 +36,7 @@ const SymptomManager = () => {
       <label>Название признака</label>
       <div className="input-row">
         <input
+          type="text"
           value={newSymptom}
           onChange={(e) => setNewSymptom(e.target.value)}
         />

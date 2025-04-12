@@ -1,102 +1,77 @@
-.diagnosis-engine {
+.diagnosis-container {
   display: flex;
+  gap: 40px;
   padding: 20px;
   font-size: 14px;
-  gap: 40px;
   flex: 1;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
 }
 
-.input-panel {
+.left-section {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+}
+
+.right-section {
+  flex: 1;
 }
 
 .checkbox-list {
-  list-style: none;
-  padding: 0;
-  border: 1px solid #ccc;
-  height: 160px;
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
   overflow-y: auto;
-  background: white;
-  margin: 0;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background: #fff;
+  margin-bottom: 20px;
 }
 
-.checkbox-list li {
-  padding: 5px 10px;
-}
-
-.input-panel select,
-.input-panel button {
+select {
+  width: 100%;
   padding: 6px;
-  font-size: 14px;
+  margin-bottom: 20px;
 }
 
-.input-panel button {
-  width: fit-content;
+.green-btn {
   background-color: #009a3e;
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 6px;
   cursor: pointer;
   margin-top: 10px;
 }
 
-.summary-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.green-btn:hover {
+  background-color: #007f33;
 }
 
-.summary-title {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.summary-panel table {
+table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 10px;
-  background: white;
+  margin-bottom: 20px;
 }
 
-.summary-panel th,
-.summary-panel td {
-  padding: 6px 10px;
+th,
+td {
   border: 1px solid #ccc;
+  padding: 8px;
   text-align: left;
 }
 
-.diagnosis-footer {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.diagnose-btn {
-  background-color: #009a3e;
-  color: white;
-  padding: 10px 20px;
-  font-weight: bold;
-  font-size: 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
 .diagnosis-result {
+  font-size: 16px;
   font-weight: bold;
-  color: #155724;
+  margin-top: 10px;
 }
 
-.diagnosis-engine::after {
-  content: "";
-  display: block;
-  height: 80px;
+.diagnosis-result ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.diagnosis-result li {
+  padding: 6px 0;
 }

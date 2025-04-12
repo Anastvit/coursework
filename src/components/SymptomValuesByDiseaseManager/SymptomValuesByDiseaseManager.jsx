@@ -1,50 +1,43 @@
 import React, { useState } from "react";
 import "./SymptomValuesByDiseaseManager.css";
 
-const SymptomValuesByDiseaseManager = () => {
-  const diseases = ["Перелом", "Вывих", "Травма мышц и сухожилий"];
-  const symptoms = [
-    "Наличие видимых повреждений",
-    "Острая боль",
-    "Изменение формы сустава"
-  ];
+const SymptomValuesByDiseaseManager = ({ knowledgeBase, setKnowledgeBase }) => {
+  const diseases = knowledgeBase.diseases || [];
+  const symptoms = knowledgeBase.symptoms || [];
+  const valuesMap = knowledgeBase.symptomValues || {};
+  const diseaseMap = knowledgeBase.symptomValuesByDisease || {};
 
-  const valuesBySymptom = {
-    "Наличие видимых повреждений": ["Присутствует", "Отсутствует"],
-    "Острая боль": ["Сильная", "Слабая"],
-    "Изменение формы сустава": ["Да", "Нет"]
-  };
+  const [selectedDisease, setSelectedDisease] = useState(diseases[0] || "");
+  const [selectedSymptom, setSelectedSymptom] = useState(symptoms[0] || "");
 
-  const [selectedDisease, setSelectedDisease] = useState(null);
-  const [selectedSymptom, setSelectedSymptom] = useState(null);
+  const currentValues =
+    diseaseMap[selectedDisease]?.[selectedSymptom] || [];
 
-  const [selectedValues, setSelectedValues] = useState({});
-
-  const handleValueToggle = (value) => {
-    if (!selectedDisease || !selectedSymptom) return;
-
-    const key = `${selectedDisease}__${selectedSymptom}`;
-    const current = selectedValues[key] || [];
-
-    const newValues = current.includes(value)
+  const toggleValue = (value) => {
+    const current = Array.isArray(currentValues) ? currentValues : [currentValues];
+    const exists = current.includes(value);
+    const newValues = exists
       ? current.filter((v) => v !== value)
       : [...current, value];
 
-    setSelectedValues((prev) => ({
-      ...prev,
-      [key]: newValues
-    }));
-  };
+    const updated = {
+      ...knowledgeBase,
+      symptomValuesByDisease: {
+        ...diseaseMap,
+        [selectedDisease]: {
+          ...diseaseMap[selectedDisease],
+          [selectedSymptom]: newValues
+        }
+      }
+    };
 
-  const getValuesForCurrent = () => {
-    const key = `${selectedDisease}__${selectedSymptom}`;
-    return selectedValues[key] || [];
+    setKnowledgeBase(updated);
   };
 
   return (
     <div className="svd-manager">
       <div className="svd-column">
-        <label>Выберите заболевание</label>
+        <label>Заболевание</label>
         <ul className="svd-list">
           {diseases.map((d, i) => (
             <li
@@ -52,7 +45,7 @@ const SymptomValuesByDiseaseManager = () => {
               className={selectedDisease === d ? "selected" : ""}
               onClick={() => {
                 setSelectedDisease(d);
-                setSelectedSymptom(null);
+                setSelectedSymptom(symptoms[0] || "");
               }}
             >
               {d}
@@ -60,7 +53,7 @@ const SymptomValuesByDiseaseManager = () => {
           ))}
         </ul>
 
-        <label>Выберите признак</label>
+        <label>Признак</label>
         <ul className="svd-list">
           {symptoms.map((s, i) => (
             <li
@@ -75,15 +68,13 @@ const SymptomValuesByDiseaseManager = () => {
       </div>
 
       <div className="svd-column">
-        <label>Отметьте значения</label>
+        <label>Значения признака</label>
         <ul className="svd-list">
-          {(valuesBySymptom[selectedSymptom] || []).map((val, i) => (
+          {(valuesMap[selectedSymptom] || []).map((val, i) => (
             <li
               key={i}
-              className={
-                getValuesForCurrent().includes(val) ? "selected" : ""
-              }
-              onClick={() => handleValueToggle(val)}
+              className={currentValues.includes(val) ? "selected" : ""}
+              onClick={() => toggleValue(val)}
             >
               {val}
             </li>
