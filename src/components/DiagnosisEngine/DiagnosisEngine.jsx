@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./DiagnosisEngine.css";
 
 const DiagnosisEngine = ({ knowledgeBase }) => {
@@ -10,28 +11,28 @@ const DiagnosisEngine = ({ knowledgeBase }) => {
     symptomValuesByDisease = {},
   } = knowledgeBase;
 
-  // Храним значения, выбранные пользователем: { признак: значение }
+  // значения, выбранные пользователем: { признак: значение }
   const [values, setValues] = useState({});
-  // Храним выбранные признаки по чекбоксам
+  // выбранные признаки по чекбоксам
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-  // Активный признак в селекте для указания значения
+  // активный признак в селекте для указания значения
   const [activeSymptom, setActiveSymptom] = useState("");
-  // Результат диагностики — теперь массив диагнозов с совпадениями
+  //  массив диагнозов с совпадениями
   const [diagnosisResults, setDiagnosisResults] = useState([]);
 
-  // Функция для переключения выбранного признака
+  // функция для переключения выбранного признака
   const toggleSymptom = (symptom) => {
     setSelectedSymptoms((prev) => {
       const updated = prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
         : [...prev, symptom];
-      // Если активный признак перестал быть выбранным, очищаем его
+      // если активный признак перестал быть выбранным, очищаем его
       if (!updated.includes(activeSymptom)) {
         setActiveSymptom("");
       }
       return updated;
     });
-    // Если значение уже задано для данного симптома, удаляем его
+    // если значение уже задано для данного симптома, удаляем его
     setValues((prev) => {
       const updated = { ...prev };
       if (updated[symptom]) {
@@ -41,7 +42,7 @@ const DiagnosisEngine = ({ knowledgeBase }) => {
     });
   };
 
-  // Установить значение для активного признака
+  // установить значение для активного признака
   const setValue = (symptom, value) => {
     setValues((prev) => ({
       ...prev,
@@ -49,52 +50,53 @@ const DiagnosisEngine = ({ knowledgeBase }) => {
     }));
   };
 
-  // Новая функция, которая анализирует введённые значения и выводит список диагнозов
-  const handleDiagnosis = () => {
-    // Массив для хранения результатов: { disease, matchCount, totalCriteria, percentage }
-    const results = [];
+  // функция для отправки данных на сервер и получения предсказаний
+  const handleDiagnosis = async () => {
+    try {
+      console.log("Выбранные симптомы:", selectedSymptoms); // логирование выбранных симптомов
+      console.log("Значения симптомов:", values); // логирование значений симптомов
 
-    for (const disease of diseases) {
-      const diseaseSymptoms = clinicalPicture[disease] || [];
-      let matchCount = 0;
-      let criteriaCount = diseaseSymptoms.length;
+      //  массив значений симптомов
+      const symptomsArray = symptoms.map((symptom) => {
+        if (!selectedSymptoms.includes(symptom)) return 0; // если симптом не выбран, значение = 0
 
-      // Для каждого симптома из клинической картины пытаемся сравнить
-      for (const symptom of diseaseSymptoms) {
-        // Если симптом не выбран или не введено значение – считаем, что критерий не выполнен
-        if (!selectedSymptoms.includes(symptom) || !values[symptom]) continue;
-        const expectedValues = symptomValuesByDisease[disease]?.[symptom];
-        const actualValue = values[symptom];
-        const isMatch = Array.isArray(expectedValues)
-          ? expectedValues.includes(actualValue)
-          : expectedValues === actualValue;
-        if (isMatch) {
-          matchCount++;
+        const value = values[symptom];
+        switch (symptom) {
+          case "степень повреждений":
+            return value === "полная" ? 1 : 0;
+          case "локализация":
+            return { голова: 1, спина: 2, ноги: 3, руки: 4 }[value] || 0;
+          case "происхождение":
+            return { острый: 1, патологический: 2, привычный: 3 }[value] || 0;
+          default:
+            return value === "присутствует" ? 1 : 0;
         }
-      }
+      });
 
-      // Если есть хоть одно совпадение, добавляем диагноз в список
-      if (matchCount > 0) {
-        results.push({
-          disease,
-          matchCount,
-          criteriaCount,
-          percentage: criteriaCount
-            ? Math.round((matchCount / criteriaCount) * 100)
-            : 0,
-        });
-      }
+      console.log("Отправляемые данные:", { symptoms: symptomsArray }); // логирование 
+
+      // запрос на API
+      const response = await axios.post("http://127.0.0.1:8000/predict", {
+        symptoms: symptomsArray,
+      });
+
+      console.log("Полученные данные:", response.data); // логирование 
+
+      // \результаты в массив диагнозов
+      const predictions = response.data;
+      const results = Object.entries(predictions).map(([disease, probability]) => ({
+        disease,
+        probability: (probability*100).toFixed(4), \
+      }));
+
+      console.log("Обработанные результаты:", results); // логирование 
+
+      // обновляем состояние с результатами
+      setDiagnosisResults(results);
+    } catch (error) {
+      console.error("Ошибка при отправке данных:", error.response?.data || error.message);
+      alert("Не удалось получить диагноз. Проверьте подключение к серверу.");
     }
-
-    // Если результатов нет, значит ни один критерий не совпал – считаем, что диагноз "здоров"
-    if (results.length === 0) {
-      setDiagnosisResults([{ disease: "здоров", matchCount: 0, percentage: 0 }]);
-      return;
-    }
-
-    // Сортируем по проценту совпадения в порядке убывания
-    results.sort((a, b) => b.percentage - a.percentage);
-    setDiagnosisResults(results);
   };
 
   return (
@@ -171,8 +173,7 @@ const DiagnosisEngine = ({ knowledgeBase }) => {
             <ul>
               {diagnosisResults.map((res, i) => (
                 <li key={i}>
-                  {res.disease} – Совпадений: {res.matchCount} из {res.criteriaCount || "?"}{" "}
-                  ({res.percentage}%)
+                  {res.disease} – Вероятность: {res.probability} %
                 </li>
               ))}
             </ul>
