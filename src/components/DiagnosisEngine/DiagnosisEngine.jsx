@@ -86,7 +86,7 @@ const DiagnosisEngine = ({ knowledgeBase }) => {
       const predictions = response.data;
       const results = Object.entries(predictions).map(([disease, probability]) => ({
         disease,
-        probability: (probability*100).toFixed(4), \
+        probability: (probability*100).toFixed(4), 
       }));
 
       console.log("Обработанные результаты:", results); // логирование 
